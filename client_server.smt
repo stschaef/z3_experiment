@@ -4,8 +4,10 @@
 (set-logic UF)
 
 ;should be unbounded sorts
-(declare-datatypes ((Client 0)) (((client0) (client1))))
-(declare-datatypes ((Server 0)) (((server0) (server1))))
+(declare-sort Client 0)
+(declare-sort Server 0)
+;(declare-datatypes ((Client 0)) (((client0) (client1))))
+;(declare-datatypes ((Server 0)) (((server0) (server1))))
 
 ;link relation and semaphore predicate
 (declare-fun link (Client Server) Bool)
