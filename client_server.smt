@@ -20,7 +20,6 @@
     (and
         ;unsure if I can reuse variable names, so I'm numbering them uniquely
         
-        ;flipped quantifiers from original emails
         ;now this says, all servers are locked or connected to some client
         (forall ((s1 Server)) (exists ((c1 Client))
             (or (semaphore s1) (link c1 s1))))
@@ -37,16 +36,34 @@
 
     ;RDNF
     (or 
+        ;config A
         ;all servers locked
         (forall ((s4 Server)) (forall ((c5 Client))
             (and (semaphore s4) (not(link c5 s4)))))
         (or 
-            ;some server is linked to some client
-            (exists ((s5 Server)) (exists ((c6 Client))
-                (or
-                (and (not(semaphore s5)) (link c6 s5))
-                (and (semaphore s5) (not(link c6 s5))))))
+            ;config B
+            ;some server is linked to some client, some server is locked
+            (and
+                ;at least one server locked
+                (exists ((s5 Server)) 
+                    (semaphore s5))
+                (and
+                    ;at least server linked
+                    (exists ((s7 Server)) 
+                        (not(semaphore s7)))
+                    (and
+                        ;if a client is linked, corresponding server must be unavailable
+                        (forall ((c6 Client)) (forall ((s8 Server))
+                            (or (not (link c6 s8)) (not(semaphore s8)))))
+                        ;at least one client must be linked
+                        (exists ((c8 Client)) (exists ((s8 Server)) 
+                            (link c8 s8))
+                        )
+                    )
+                )
+            )
 
+            ;config C
             ;all servers are linked to some client
             (forall ((s6 Server)) (exists ((c7 Client))
                 (and (not(semaphore s6)) (link c7 s6)))
