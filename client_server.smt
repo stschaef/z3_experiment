@@ -41,27 +41,11 @@
         (forall ((s4 Server)) (forall ((c5 Client))
             (and (semaphore s4) (not(link c5 s4)))))
         (or 
-            ;some linked, some unlinked 
-            ;changed this from the original proposal, as it allowed for a
-            ;linked server to also be locked
-            ;Note: this is probably wrong
-            (exists ((s5 Server))
-                (exists ((s7 Server))
-                    (forall ((c6 Client))
-                        (exists ((c8 Client))
-                            (and
-                                (semaphore s5)
-                                (and 
-                                    (not (semaphore s7))
-                                    (and (not(link c6 s5))
-                                        (link c8 s7)
-                                    )
-                                )
-                            )
-                        )
-                    )
-                )
-            )
+            ;some server is linked to some client
+            (exists ((s5 Server)) (exists ((c6 Client))
+                (or
+                (and (not(semaphore s5)) (link c6 s5))
+                (and (semaphore s5) (not(link c6 s5))))))
 
             ;all servers are linked to some client
             (forall ((s6 Server)) (exists ((c7 Client))
