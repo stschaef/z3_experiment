@@ -56,9 +56,12 @@
                         (forall ((c6 Client)) (forall ((s8 Server))
                             (or (not (link c6 s8)) (not(semaphore s8)))))
                         ;at least one client must be linked
-                        (exists ((c8 Client)) (exists ((s8 Server)) 
+                        (and (forall ((c2 Client)) (forall ((c3 Client)) (forall ((s2 Server))
+                (or (= c2 c3) (or (not(link c2 s2)) (not(link c3 s2))))))) 
+                (exists ((c8 Client)) (exists ((s8 Server)) 
                             (link c8 s8))
-                        )
+                        ))
+                        
                     )
                 )
             )
@@ -66,7 +69,11 @@
             ;config C
             ;all servers are linked to some client
             (forall ((s6 Server)) (exists ((c7 Client))
-                (and (not(semaphore s6)) (link c7 s6)))
+                (and (not(semaphore s6)) 
+                    (and (link c7 s6) (forall ((c2 Client)) (forall ((c3 Client)) (forall ((s2 Server))
+                (or (= c2 c3) (or (not(link c2 s2)) (not(link c3 s2))))))))
+                
+                ))
             )
         )
     ) 
