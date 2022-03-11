@@ -4,10 +4,10 @@
 (set-logic UF)
 
 ;should be unbounded sorts
-;(declare-sort Client 0)
-;(declare-sort Server 0)
-(declare-datatypes ((Client 0)) (((client0) (client1))))
-(declare-datatypes ((Server 0)) (((server0) (server1))))
+(declare-sort Client 0)
+(declare-sort Server 0)
+;(declare-datatypes ((Client 0)) (((client0) (client1) (client2) (client3))))
+;(declare-datatypes ((Server 0)) (((server0) (server1) (server2) (server3))))
 
 ;link relation and semaphore predicate
 (declare-fun link (Client Server) Bool)
@@ -48,19 +48,30 @@
                 (exists ((s5 Server)) 
                     (semaphore s5))
                 (and
-                    ;at least server linked
+                    ;at least one server linked
                     (exists ((s7 Server)) 
                         (not(semaphore s7)))
                     (and
                         ;if a client is linked, corresponding server must be unavailable
                         (forall ((c6 Client)) (forall ((s8 Server))
                             (or (not (link c6 s8)) (not(semaphore s8)))))
-                        ;at least one client must be linked
-                        (and (forall ((c2 Client)) (forall ((c3 Client)) (forall ((s2 Server))
-                (or (= c2 c3) (or (not(link c2 s2)) (not(link c3 s2))))))) 
-                (exists ((c8 Client)) (exists ((s8 Server)) 
-                            (link c8 s8))
-                        ))
+                        (forall ((s9 Server))
+                            (or
+                                (semaphore s9)
+                                (exists ((c8 Client))
+                                    (and 
+                                        (link c8 s9)
+                                        (forall ((c9 Client))
+                                            (or 
+                                                (not(link c9 s9))
+                                                (= c8 c9)
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+
                         
                     )
                 )
