@@ -52,9 +52,10 @@
                     (exists ((s7 Server)) 
                         (not(semaphore s7)))
                     (and
-                        ;if a client is linked, corresponding server must be unavailable
+                        ;locked servers must be unlinked
                         (forall ((c6 Client)) (forall ((s8 Server))
                             (or (not (link c6 s8)) (not(semaphore s8)))))
+                        ;nonlocked servers must be linked to a unique client
                         (forall ((s9 Server))
                             (or
                                 (semaphore s9)
@@ -62,30 +63,27 @@
                                     (and 
                                         (link c8 s9)
                                         (forall ((c9 Client))
-                                            (or 
-                                                (not(link c9 s9))
-                                                (= c8 c9)
-                                            )
-                                        )
+                                            (or (not(link c9 s9)) (= c8 c9)))
                                     )
                                 )
                             )
                         )
-
-                        
                     )
                 )
             )
 
             ;config C
-            ;all servers are linked to some client
+            ;all servers are linked to a unique client
             (forall ((s6 Server)) (exists ((c7 Client))
                 (and (not(semaphore s6)) 
-                    (and (link c7 s6) (forall ((c2 Client)) (forall ((c3 Client)) (forall ((s2 Server))
-                (or (= c2 c3) (or (not(link c2 s2)) (not(link c3 s2))))))))
-                
-                ))
-            )
+                    (and 
+                        (link c7 s6) 
+                        (forall ((c2 Client)) (forall ((c3 Client)) (forall ((s2 Server))
+                            (or (= c2 c3) (or (not(link c2 s2)) (not(link c3 s2))))))
+                        )
+                    )
+                )
+            ))
         )
     ) 
 )
