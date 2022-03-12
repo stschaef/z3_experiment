@@ -20,6 +20,9 @@
     (and 
         (forall ((x RM)) (forall ((y RM))
             ;Note: this can be resolved and simplified with the a|c|p|w clause
+            ;this resolves to
+            ;\forall x,y: (x != y) -> (~c(y) -> (c(x) | p(x))
+            ;you can then infer (\exists x: c(x)) -> (\forall y: c(y) | p(y)) 
             (or 
             (= x y)
             (aborted y)
@@ -30,47 +33,11 @@
             ))
         )
         (forall ((x RM))
-            (or
-            (aborted x)
-            (committed x)
-            (prepared x)
-            (working x)
-            )
-        )
-        (forall ((x RM))
-            (or
-            (not (aborted x))
-            (not (committed x))
-            )
-        )
-        (forall ((x RM))
-            (or
-            (not (aborted x))
-            (not (prepared x))
-            )
-        )
-        (forall ((x RM))
-            (or
-            (not (aborted x))
-            (not (working x))
-            )
-        )
-        (forall ((x RM))
-            (or
-            (not (committed x))
-            (not (prepared x))
-            )
-        )
-        (forall ((x RM))
-            (or
-            (not (committed x))
-            (not (working x))
-            )
-        )
-        (forall ((x RM))
-            (or
-            (not (prepared x))
-            (not (working x))
+            (xor
+                (aborted x)
+                (committed x)
+                (prepared x)
+                (working x)
             )
         )
     )
@@ -79,155 +46,199 @@
     (or
         ;A
         (forall ((x RM))
-            (aborted x)
+            (and
+                (aborted x)
+                (xor
+                    (aborted x)
+                    (committed x)
+                    (prepared x)
+                    (working x)
+                )
+            )
         )
         ;C
         (forall ((x RM))
-            (committed x)
+            (and
+                (committed x)
+                (xor
+                    (aborted x)
+                    (committed x)
+                    (prepared x)
+                    (working x)
+                )
+            )
         )
         ;P
         (forall ((x RM))
-            (prepared x)
+            (and
+                (prepared x)
+                (xor
+                    (aborted x)
+                    (committed x)
+                    (prepared x)
+                    (working x)
+                )
+            )
         )
         ;W
         (forall ((x RM))
-            (working x)
+            (and
+                (working x)
+                (xor
+                    (aborted x)
+                    (committed x)
+                    (prepared x)
+                    (working x)
+                )
+            )
         )
         ;AP
-        (exists ((x RM))
-            (exists ((y RM))
-                (or
-                (not(= x y))
-                (and
+        (and
+            (exists ((x RM))
+                (exists ((y RM))
+                    (and 
                     (aborted x)
                     (prepared y)
-                    (forall ((z RM))
-                        (or
-                            (or 
-                                (= x y)
-                                (= y z)
-                                (= x z)
-                            )
-                            (xor
-                                (aborted z)
-                                (prepared z)
-                            )
-                        ) 
+                    (not (= x y))
                     )
                 )
+            )
+            (forall ((x RM))
+                (and 
+                    (or
+                        (aborted x)
+                        (prepared x)
+                    )
+                    (forall ((x RM))
+                        (xor
+                            (aborted x)
+                            (committed x)
+                            (prepared x)
+                            (working x)
+                        )
+                    )
                 )
             )
         )
 
         ;AW
-        (exists ((x RM))
-            (exists ((y RM))
-                (or
-                (not(= x y))
-                (and
+        (and
+            (exists ((x RM))
+                (exists ((y RM))
+                    (and 
                     (aborted x)
                     (working y)
-                    (forall ((z RM))
-                        (or
-                            (or 
-                                (= x y)
-                                (= y z)
-                                (= x z)
-                            )
-                            (xor
-                                (aborted z)
-                                (working z)
-                            )
-                        ) 
+                    (not (= x y))
                     )
                 )
+            )
+            (forall ((x RM))
+                (and 
+                    (or
+                        (aborted x)
+                        (working x)
+                    )
+                    (forall ((x RM))
+                        (xor
+                            (aborted x)
+                            (committed x)
+                            (prepared x)
+                            (working x)
+                        )
+                    )
                 )
             )
         )
 
         ;CP
-        (exists ((x RM))
-            (exists ((y RM))
-                (or
-                (not(= x y))
-                (and
+        (and
+            (exists ((x RM))
+                (exists ((y RM))
+                    (and 
                     (committed x)
                     (prepared y)
-                    (forall ((z RM))
-                        (or
-                            (or 
-                                (= x y)
-                                (= y z)
-                                (= x z)
-                            )
-                            (xor
-                                (committed z)
-                                (prepared z)
-                            )
-                        ) 
+                    (not (= x y))
                     )
                 )
+            )
+            (forall ((x RM))
+                (and 
+                    (or
+                        (committed x)
+                        (prepared x)
+                    )
+                    (forall ((x RM))
+                        (xor
+                            (aborted x)
+                            (committed x)
+                            (prepared x)
+                            (working x)
+                        )
+                    )
                 )
             )
         )
 
         ;PW
-        (exists ((x RM))
-            (exists ((y RM))
-                (or
-                (not(= x y))
-                (and
+        (and
+            (exists ((x RM))
+                (exists ((y RM))
+                    (and 
                     (working x)
                     (prepared y)
-                    (forall ((z RM))
-                        (or
-                            (or 
-                                (= x y)
-                                (= y z)
-                                (= x z)
-                            )
-                            (xor
-                                (working z)
-                                (prepared z)
-                            )
-                        ) 
+                    (not (= x y))
                     )
                 )
+            )
+            (forall ((x RM))
+                (and 
+                    (or
+                        (working x)
+                        (prepared x)
+                    )
+                    (forall ((x RM))
+                        (xor
+                            (aborted x)
+                            (committed x)
+                            (prepared x)
+                            (working x)
+                        )
+                    )
                 )
             )
         )
 
         ;APW
-        (exists ((x RM))
-            (exists ((y RM))
-                (exists ((z RM))
-                    (or
-                        (or 
-                            (= x y)
-                            (= y z)
-                            (= x z)
-                        )
+        (and
+            (exists ((x RM))
+                (exists ((y RM))
+                    (exists ((z RM))
+                        (and 
+                        (aborted x)
+                        (prepared y)
+                        (working z)
                         (and
+                            (not (= x y))
+                            (not (= z y))
+                            (not (= x z))
+                        )
+                        )
+                    )
+                )
+            )
+            (forall ((x RM))
+                (and 
+                    (or
+                        (aborted x)
+                        (prepared x)
+                        (working x)
+                    )
+                    (forall ((x RM))
+                        (xor
                             (aborted x)
-                            (prepared y)
-                            (working z)
-                            (forall ((w RM))
-                                (or
-                                    (or 
-                                        (= x y)
-                                        (= y w)
-                                        (= x w)
-                                        (= z w)
-                                        (= y z)
-                                        (= x z)
-                                    )
-                                    (xor
-                                        (aborted w)
-                                        (prepared w)
-                                        (working w)
-                                    )
-                                ) 
-                            )
+                            (committed x)
+                            (prepared x)
+                            (working x)
                         )
                     )
                 )
