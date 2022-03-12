@@ -76,20 +76,6 @@
     )
 
     ;Configs
-;    Also choose(x_1, x_2, ...., x_n) should return 1 if exactly one xi is equal to 1. Using | for OR, & for AND, ~ for NOT, choose can be expressed in CNF as (hopefully n is small, 2 or 3)
-;choose(x_1, x_2, ..., x_n) = (x_1 | x_2 | ... | x_n)  (~x_1 | ~x_2)  ... (~x_1 | ~x_n)  (~x_2 | ~x_3) ... (~x_2 | ~x_n) ... (~x_{n-1} | ~x_n)
-;
-;Config A: \forall R: w(R)
-;Config C: \forall R: c(R)
-;Config P: \forall R: p(R)
-;Config W: \forall R: w(R)
-;
-;Config AP:  \exists R1, R2: distinct(R1, R2) --> (a(R1) & p(R2) & (\forall R3: distinct(R1, R2, R3) --> choose(a(R3), p(R3))))
-;Config AW:  \exists R1, R2: distinct(R1, R2) --> (a(R1) & w(R2) & (\forall R3: distinct(R1, R2, R3) --> choose(a(R3), w(R3))))
-;Config CP:  \exists R1, R2: distinct(R1, R2) --> (c(R1) & p(R2) & (\forall R3: distinct(R1, R2, R3) --> choose(c(R3), p(R3))))
-;Config PW:  \exists R1, R2: distinct(R1, R2) --> (p(R1) & w(R2) & (\forall R3: distinct(R1, R2, R3) --> choose(p(R3), w(R3))))
-;
-;Config APW: \exists R1, R2, R3: distinct(R1, R2, R3) --> (a(R1) & p(R2) & w(R3) & (\forall R4: distinct(R1, R2, R3, R4) --> choose(a(R4), p(R4), w(R4))))
     (or
         ;A
         (forall ((x RM))
@@ -108,17 +94,145 @@
             (working x)
         )
         ;AP
-        (
-
+        (exists ((x RM))
+            (exists ((y RM))
+                (or
+                (not(= x y))
+                (and
+                    (aborted x)
+                    (prepared y)
+                    (forall ((z RM))
+                        (or
+                            (or 
+                                (= x y)
+                                (= y z)
+                                (= x z)
+                            )
+                            (xor
+                                (aborted z)
+                                (prepared z)
+                            )
+                        ) 
+                    )
+                )
+                )
+            )
         )
 
         ;AW
+        (exists ((x RM))
+            (exists ((y RM))
+                (or
+                (not(= x y))
+                (and
+                    (aborted x)
+                    (working y)
+                    (forall ((z RM))
+                        (or
+                            (or 
+                                (= x y)
+                                (= y z)
+                                (= x z)
+                            )
+                            (xor
+                                (aborted z)
+                                (working z)
+                            )
+                        ) 
+                    )
+                )
+                )
+            )
+        )
 
         ;CP
+        (exists ((x RM))
+            (exists ((y RM))
+                (or
+                (not(= x y))
+                (and
+                    (committed x)
+                    (prepared y)
+                    (forall ((z RM))
+                        (or
+                            (or 
+                                (= x y)
+                                (= y z)
+                                (= x z)
+                            )
+                            (xor
+                                (committed z)
+                                (prepared z)
+                            )
+                        ) 
+                    )
+                )
+                )
+            )
+        )
 
         ;PW
+        (exists ((x RM))
+            (exists ((y RM))
+                (or
+                (not(= x y))
+                (and
+                    (working x)
+                    (prepared y)
+                    (forall ((z RM))
+                        (or
+                            (or 
+                                (= x y)
+                                (= y z)
+                                (= x z)
+                            )
+                            (xor
+                                (working z)
+                                (prepared z)
+                            )
+                        ) 
+                    )
+                )
+                )
+            )
+        )
 
         ;APW
+        (exists ((x RM))
+            (exists ((y RM))
+                (exists ((z RM))
+                    (or
+                        (or 
+                            (= x y)
+                            (= y z)
+                            (= x z)
+                        )
+                        (and
+                            (aborted x)
+                            (prepared y)
+                            (working z)
+                            (forall ((w RM))
+                                (or
+                                    (or 
+                                        (= x y)
+                                        (= y w)
+                                        (= x w)
+                                        (= z w)
+                                        (= y z)
+                                        (= x z)
+                                    )
+                                    (xor
+                                        (aborted w)
+                                        (prepared w)
+                                        (working w)
+                                    )
+                                ) 
+                            )
+                        )
+                    )
+                )
+            )
+        )
 
         
     )
