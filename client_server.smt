@@ -3,91 +3,104 @@
 
 (set-logic UF)
 
-;should be unbounded sorts
 (declare-sort Client 0)
 (declare-sort Server 0)
-;(declare-datatypes ((Client 0)) (((client0) (client1) (client2) (client3))))
-;(declare-datatypes ((Server 0)) (((server0) (server1) (server2) (server3))))
 
 ;link relation and semaphore predicate
 (declare-fun link (Client Server) Bool)
 (declare-fun semaphore (Server) Bool)
 
-;this SHOULD return unsat if RCNF and RDNF are equivalent
 (assert 
 (xor
-    ;RCNF
+    ;conjuction of constraints
     (and
-        ;unsure if I can reuse variable names, so I'm numbering them uniquely
-        
-        ;now this says, all servers are locked or connected to some client
-        (forall ((s1 Server)) (exists ((c1 Client))
-            (or (semaphore s1) (link c1 s1))))
-        (and
-            ;a server cannot be connected to two distinct clients
-            ;does this need some reference to a semaphore?
-            (forall ((c2 Client)) (forall ((c3 Client)) (forall ((s2 Server))
-                (or (= c2 c3) (or (not(link c2 s2)) (not(link c3 s2)))))))
-            ;a server is not both linked and locked
-            (forall ((c4 Client)) (forall ((s3 Server))
-                (or (not(link c4 s3)) (not(semaphore s3)))))
+        ;either linked or locked
+        (forall ((s Server)) (exists ((c Client))
+            (or 
+                (semaphore s) 
+                (link c s))
+            )
+        )
+        ;a server cannot be connected to two distinct clients
+        (forall ((c1 Client) (c2 Client) (s Server))
+            (or 
+                (= c1 c2)
+                (not(link c1 s))
+                (not(link c2 s))
+            )
+        )
+        ;a server is not both linked and locked
+        (forall ((c Client) (s Server))
+            (or 
+                (not(link c s))
+                (not(semaphore s))
+            )
         )
     )
 
-    ;RDNF
-    (or 
-        ;config A
-        ;all servers locked
-        (forall ((s4 Server)) (forall ((c5 Client))
-            (and (semaphore s4) (not(link c5 s4)))))
-        (or 
-            ;config B
-            ;some server is linked to some client, some server is locked
-            (and
-                ;at least one server locked
-                (exists ((s5 Server)) 
-                    (semaphore s5))
-                (and
-                    ;at least one server linked
-                    (exists ((s7 Server)) 
-                        (not(semaphore s7)))
-                    (and
-                        ;locked servers must be unlinked
-                        (forall ((c6 Client)) (forall ((s8 Server))
-                            (or (not (link c6 s8)) (not(semaphore s8)))))
-                        ;nonlocked servers must be linked to a unique client
-                        (forall ((s9 Server))
-                            (or
-                                (semaphore s9)
-                                (exists ((c8 Client))
-                                    (and 
-                                        (link c8 s9)
-                                        (forall ((c9 Client))
-                                            (or (not(link c9 s9)) (= c8 c9)))
-                                    )
-                                )
-                            )
-                        )
+    ;disjunction of configs
+    (or
+        ;all locked
+        (and
+            (forall ((s Server))
+                (semaphore s)
+            )
+            (forall ((c Client) (s Server)) 
+                (not(semaphore s))
+            )
+        )
+
+        ;at least one locked, at least one linked
+        (and
+            (exists ((s Server))
+                (semaphore s)
+            )
+            (exists ((s Server))
+                (not(semaphore s))
+            )
+            (forall ((s Server))
+                (or
+                    (semaphore s)
+                    (exists ((c Client))
+                        (link c s)
                     )
                 )
             )
-
-            ;config C
-            ;all servers are linked to a unique client
-            (forall ((s6 Server)) (exists ((c7 Client))
-                (and (not(semaphore s6)) 
-                    (and 
-                        (link c7 s6) 
-                        (forall ((c2 Client)) (forall ((c3 Client)) (forall ((s2 Server))
-                            (or (= c2 c3) (or (not(link c2 s2)) (not(link c3 s2))))))
+            (forall ((s Server) (c1 Client) (c2 Client))
+                (or
+                    (not
+                        (and
+                            (link c1 s)
+                            (link c2 s)
                         )
                     )
+                    (= c1 c2)
                 )
-            ))
+            )
         )
-    ) 
-)
-)
+
+        ;all linked
+        (and 
+            (forall ((s Server)) (exists ((c Client))
+                (link c s))
+            )
+            (forall ((s Server) (c1 Client) (c2 Client))
+                (or
+                    (not
+                        (and
+                            (link c1 s)
+                            (link c2 s)
+                        )
+                    )
+                    (= c1 c2)
+                )
+            )
+            (forall ((s Server))
+                (not(semaphore s))
+            )
+        )
+    )
+))
 
 
 (check-sat) 
