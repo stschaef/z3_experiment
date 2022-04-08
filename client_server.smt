@@ -58,10 +58,18 @@
             (exists ((s Server))
                 (not(semaphore s))
             )
-            (forall ((s Server) (c Client))
-                (or
+            (forall ((s Server))
+                (=>
                     (not (semaphore s))
-                    (not (link c s))
+                    (exists ((c Client))
+                        (link c s)
+                    )
+                )
+            )
+            (forall ((s Server) (c Client))
+                (=>
+                    (semaphore s)
+                    (not(link c s))
                 )
             )
             (forall ((s Server) (c1 Client) (c2 Client))
