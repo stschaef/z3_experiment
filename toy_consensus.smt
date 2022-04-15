@@ -20,31 +20,6 @@
 (declare-fun decision (value) Bool)
 (declare-fun chosenAt (quorum value) Bool)
 
-;didNotVote defined by vote
-(assert
-    (forall ((n node))
-        (=
-            (didNotVote n)
-            (forall ((v value))
-                (not (vote n v))
-            )
-        )
-    )
-)
-
-;chosenAt defined by membership
-(assert
-    (forall ((q quorum) (v value) (n node))
-        (=
-            (chosenAt q v)
-            (=>
-                (member n q)
-                (vote n v)
-            )
-        )
-    )
-)
-
 ;membership is not freely chosen
 (assert
     (and
@@ -72,7 +47,6 @@
 )
 
 (assert
-(xor
     ;constraints
     (and
         (forall ((n node) (v value))
@@ -90,10 +64,12 @@
                 (= v1 v2)
             )
         )
-        (forall ((n node) (v value))
-            (or
-                (didNotVote n)
-                (vote n v)
+        (forall ((n node))
+            (exists ((v value))
+                (or
+                    (didNotVote n)
+                    (vote n v)
+                )
             )
         )
         (forall ((q quorum) (v value))
@@ -130,9 +106,10 @@
             )
         )
     )
-
+)
+(assert
     ;configs
-    (or
+    (not(or
         ;no votes, cannot be chosen, cannot be decided
         (and
             (forall ((n node))
@@ -233,10 +210,7 @@
             )
         )
     )
-)
-)
-
-
+))
 
 (check-sat) 
 (get-model)
