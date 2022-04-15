@@ -4,9 +4,9 @@
 (set-logic UF)
 
 ;unbounded
-(declare-sort RM 0)
+;(declare-sort RM 0)
 ;bounded
-;(declare-datatypes ((RM 0)) (((rm0) (rm1) (rm2) (rm3))))
+(declare-datatypes ((RM 0)) (((rm0) (rm1) (rm2))))
 
 ;state predicates
 (declare-fun aborted (RM) Bool)
@@ -14,32 +14,104 @@
 (declare-fun prepared (RM) Bool)
 (declare-fun working (RM) Bool)
 
-(assert 
+(assert
+(and(forall ((x RM))
+    (and
+        (=>
+            (aborted x)
+            (and
+                (not(working x))
+                (not(committed x))
+                (not(prepared x))
+            )
+        
+        )
+        (=>
+            (working x)
+            (and
+                (not(aborted x))
+                (not(committed x))
+                (not(prepared x))
+            )
+        
+        )
+        (=>
+            (committed x)
+            (and
+                (not(working x))
+                (not(aborted x))
+                (not(prepared x))
+            )
+        
+        )
+        (=>
+            (prepared x)
+            (and
+                (not(working x))
+                (not(committed x))
+                (not(aborted x))
+            )
+        
+        )
+    )
+)
+
+
 (xor
     ;CNF
     (and 
-        (forall ((x RM)) (forall ((y RM))
-            ;Note: this can be resolved and simplified with the a|c|p|w clause
-            ;this resolves to
-            ;\forall x,y: (x != y) -> (~c(y) -> (c(x) | p(x))
-            ;you can then infer (\exists x: c(x)) -> (\forall y: c(y) | p(y)) 
-            (or 
-            (= x y)
-            (aborted y)
-            (committed x)
-            (prepared x)
-            (prepared y)
-            (working y)
-            ))
-        )
-        (forall ((x RM))
-            (xor
-                (aborted x)
-                (committed x)
-                (prepared x)
-                (working x)
+        (forall ((x RM) (y RM))
+            (=> 
+                (not(= x y))
+                (or
+                    (aborted y)
+                    (committed x)
+                    (prepared x)
+                    (prepared y)
+                    (working y)
+                )
             )
         )
+        (forall ((x RM))
+    (and
+        (=>
+            (aborted x)
+            (and
+                (not(working x))
+                (not(committed x))
+                (not(prepared x))
+            )
+        
+        )
+        (=>
+            (working x)
+            (and
+                (not(aborted x))
+                (not(committed x))
+                (not(prepared x))
+            )
+        
+        )
+        (=>
+            (committed x)
+            (and
+                (not(working x))
+                (not(aborted x))
+                (not(prepared x))
+            )
+        
+        )
+        (=>
+            (prepared x)
+            (and
+                (not(working x))
+                (not(committed x))
+                (not(aborted x))
+            )
+        
+        )
+    )
+)
     )
 
     ;Configs
@@ -48,24 +120,12 @@
         (forall ((x RM))
             (and
                 (aborted x)
-                (xor
-                    (aborted x)
-                    (committed x)
-                    (prepared x)
-                    (working x)
-                )
             )
         )
         ;C
         (forall ((x RM))
             (and
                 (committed x)
-                (xor
-                    (aborted x)
-                    (committed x)
-                    (prepared x)
-                    (working x)
-                )
             )
         )
         ;P
@@ -84,12 +144,7 @@
         (forall ((x RM))
             (and
                 (working x)
-                (xor
-                    (aborted x)
-                    (committed x)
-                    (prepared x)
-                    (working x)
-                )
+
             )
         )
         ;AP
@@ -109,14 +164,6 @@
                         (aborted x)
                         (prepared x)
                     )
-                    (forall ((x RM))
-                        (xor
-                            (aborted x)
-                            (committed x)
-                            (prepared x)
-                            (working x)
-                        )
-                    )
                 )
             )
         )
@@ -133,20 +180,11 @@
                 )
             )
             (forall ((x RM))
-                (and 
-                    (or
-                        (aborted x)
-                        (working x)
-                    )
-                    (forall ((x RM))
-                        (xor
-                            (aborted x)
-                            (committed x)
-                            (prepared x)
-                            (working x)
-                        )
-                    )
+                (or
+                    (aborted x)
+                    (working x)
                 )
+            
             )
         )
 
@@ -167,14 +205,7 @@
                         (committed x)
                         (prepared x)
                     )
-                    (forall ((x RM))
-                        (xor
-                            (aborted x)
-                            (committed x)
-                            (prepared x)
-                            (working x)
-                        )
-                    )
+
                 )
             )
         )
@@ -196,14 +227,7 @@
                         (working x)
                         (prepared x)
                     )
-                    (forall ((x RM))
-                        (xor
-                            (aborted x)
-                            (committed x)
-                            (prepared x)
-                            (working x)
-                        )
-                    )
+
                 )
             )
         )
@@ -233,14 +257,6 @@
                         (prepared x)
                         (working x)
                     )
-                    (forall ((x RM))
-                        (xor
-                            (aborted x)
-                            (committed x)
-                            (prepared x)
-                            (working x)
-                        )
-                    )
                 )
             )
         )
@@ -248,7 +264,7 @@
         
     )
 )
-)
+))
 
 
 (check-sat) 

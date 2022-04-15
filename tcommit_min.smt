@@ -7,7 +7,7 @@
 ;(declare-sort RM 0)
 ;bounded
 ;
-(declare-datatypes ((RM 0)) (((rm1))))
+(declare-datatypes ((RM 0)) (((rm1) (rm2) (rm3))))
 
 ;state predicates
 (declare-fun aborted (RM) Bool)
@@ -15,7 +15,49 @@
 (declare-fun prepared (RM) Bool)
 (declare-fun working (RM) Bool)
 
-(assert 
+(assert
+
+(and
+(forall ((x RM))
+    (and
+        (=>
+            (aborted x)
+            (and
+                (not(working x))
+                (not(committed x))
+                (not(prepared x))
+            )
+        
+        )
+        (=>
+            (working x)
+            (and
+                (not(aborted x))
+                (not(committed x))
+                (not(prepared x))
+            )
+        
+        )
+        (=>
+            (committed x)
+            (and
+                (not(working x))
+                (not(aborted x))
+                (not(prepared x))
+            )
+        
+        )
+        (=>
+            (prepared x)
+            (and
+                (not(working x))
+                (not(committed x))
+                (not(aborted x))
+            )
+        
+        )
+    )
+)
 (xor
     ;Constraints
     (and 
@@ -212,6 +254,7 @@
             )
         )
     )
+)
 )
 )
 
