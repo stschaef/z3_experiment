@@ -1,7 +1,7 @@
 import itertools
 from math import ceil, floor
 
-NUM_NODES = 10
+NUM_NODES = 5
 indices = range(1, NUM_NODES + 1)
 
 quorum_size = floor(NUM_NODES / 2) + 1
