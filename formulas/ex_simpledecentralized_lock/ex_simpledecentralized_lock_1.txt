@@ -1,0 +1,3 @@
+has_lock(n1) | message(n1,n1)
+start_nodeIS(n1)
+~has_lock(n1) | ~message(n1,n1)

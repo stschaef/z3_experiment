@@ -1,0 +1,5 @@
+\exists V1 . didNotVote(n1) | vote(n1,V1)
+\exists V1 . ~chosenAt(q1,V1)
+\forall V1 . chosenAt(q1,V1) | ~decision(V1)
+\forall V1 . chosenAt(q1,V1) | ~vote(n1,V1)
+\forall V1 . ~chosenAt(q1,V1) | ~didNotVote(n1)

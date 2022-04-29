@@ -1,0 +1,7 @@
+aborted(r1) | committed(r1) | prepared(r1) | working(r1)
+~aborted(r1) | ~committed(r1)
+~aborted(r1) | ~prepared(r1)
+~aborted(r1) | ~working(r1)
+~committed(r1) | ~prepared(r1)
+~committed(r1) | ~working(r1)
+~prepared(r1) | ~working(r1)

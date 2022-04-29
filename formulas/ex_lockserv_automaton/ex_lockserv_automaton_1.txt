@@ -1,0 +1,7 @@
+grant_msg(n1) | holds_lock(n1) | unlock_msg(n1) | ~held()
+held() | ~grant_msg(n1)
+held() | ~holds_lock(n1)
+held() | ~unlock_msg(n1)
+~grant_msg(n1) | ~holds_lock(n1)
+~grant_msg(n1) | ~unlock_msg(n1)
+~holds_lock(n1) | ~unlock_msg(n1)

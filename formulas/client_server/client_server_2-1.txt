@@ -1,0 +1,2 @@
+\forall S1 . link(c1,S1) | semaphore(S1)
+\forall S1 . ~link(c1,S1) | ~semaphore(S1)

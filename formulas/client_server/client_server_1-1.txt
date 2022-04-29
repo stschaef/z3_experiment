@@ -1,0 +1,2 @@
+link(c1,s1) | semaphore(s1)
+~link(c1,s1) | ~semaphore(s1)

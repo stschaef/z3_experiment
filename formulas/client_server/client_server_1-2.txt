@@ -1,0 +1,3 @@
+\exists C1 . link(C1,s1) | semaphore(s1)
+\exists C1 . ~link(C1,s1)
+\forall C1 . ~link(C1,s1) | ~semaphore(s1)

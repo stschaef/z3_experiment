@@ -1,0 +1,8 @@
+\forall R1 . \forall R2 . R1 == R2 | aborted(R1) | committed(R2) | prepared(R1) | prepared(R2) | working(R1)
+\forall R1 . aborted(R1) | committed(R1) | prepared(R1) | working(R1)
+\forall R1 . ~aborted(R1) | ~committed(R1)
+\forall R1 . ~aborted(R1) | ~prepared(R1)
+\forall R1 . ~aborted(R1) | ~working(R1)
+\forall R1 . ~committed(R1) | ~prepared(R1)
+\forall R1 . ~committed(R1) | ~working(R1)
+\forall R1 . ~prepared(R1) | ~working(R1)

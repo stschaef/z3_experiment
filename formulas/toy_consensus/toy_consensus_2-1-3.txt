@@ -1,0 +1,6 @@
+\exists N1 . \exists N2 . \forall V1 . \forall V2 . \forall V3 . V1 == V2 | V1 == V3 | V2 == V3 | chosenAt(q12,V1) | didNotVote(N1) | vote(N2,V2) | vote(N2,V3)
+\exists V1 . \forall N1 . didNotVote(N1) | vote(N1,V1)
+\forall N1 . \forall V1 . \forall V2 . V1 == V2 | ~vote(N1,V1) | ~vote(N1,V2)
+\forall N1 . \forall V1 . vote(N1,V1) | ~chosenAt(q12,V1)
+\forall N1 . \forall V1 . ~didNotVote(N1) | ~vote(N1,V1)
+\forall V1 . chosenAt(q12,V1) | ~decision(V1)

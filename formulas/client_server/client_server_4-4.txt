@@ -1,0 +1,3 @@
+\exists C1 . \forall S1 . link(C1,S1) | semaphore(S1)
+\forall C1 . \forall C2 . \forall S1 . C1 == C2 | ~link(C1,S1) | ~link(C2,S1)
+\forall C1 . \forall S1 . ~link(C1,S1) | ~semaphore(S1)

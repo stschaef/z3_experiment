@@ -1,0 +1,4 @@
+chosenAt(q1,v1) | didNotVote(n1)
+chosenAt(q1,v1) | ~decision(v1)
+vote(n1,v1) | ~chosenAt(q1,v1)
+~didNotVote(n1) | ~vote(n1,v1)
