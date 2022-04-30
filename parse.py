@@ -1,6 +1,7 @@
 from distutils.command.build import build
 from typing import List
 import logiclib
+import re
 
 protocols = ["toy_consensus",
              "ex_lockservice",
@@ -47,16 +48,16 @@ def build_smt(parsed, prot, ind_lvl):
     if len(parsed) == 0:
         return ind_lvl * 4 * " " + ""
     if len(parsed) == 1:
-        ind_lvl * 4 * " " + parsed[0]
+        return ind_lvl * 4 * " " + parsed[0]
 
     # function application
-    if len(parsed) == 2 and type(parsed[1]) == list:
+    if len(parsed) == 2 and parsed[0] != "~" and type(parsed[1]) == list:
         arg_string = " ".join(parsed[1])
         return ind_lvl * 4 * " " + f"({parsed[0]} {arg_string})"
 
     # negation
-    if len(parsed) == 2:
-        return ind_lvl * 4 * " " + f"(not {build_smt(parsed[1], prot, ind_lvl)})"
+    if len(parsed) == 2 and parsed[0] == "~":
+        return ind_lvl * 4 * " " + f"(not {build_smt(parsed[1], prot, 0)})"
 
     # quantification
     if type(parsed[0]) == str and parsed[0] in quantifier.keys():
@@ -66,8 +67,11 @@ def build_smt(parsed, prot, ind_lvl):
     if type(parsed[1]) == str and parsed[1] in operators.keys():
         return ind_lvl * 4 * " " + f"({operators[parsed[1]]}\n{build_smt(parsed[0], prot, ind_lvl + 1)}\n{build_smt(parsed[2], prot, ind_lvl + 1)}\n{build_smt(')', prot, ind_lvl)}"
  
-for line in open("formulas/client_server/client_server_3-3.txt"):
+for line in open("formulas/ex_lockserv_automaton/ex_lockserv_automaton_3.txt"):
     # print("formulas/client_server/client_server_1-2.txt"[:-4])
-    print("\n\n", line)
+    line = line.replace("_", "").replace("()", "")
     parsed = logiclib.pyparsing_parse(line)
-    print(build_smt(parsed, "client_server", 0))
+    print(line)
+    print(parsed)
+    print(build_smt(parsed, "ex_lockservice", 0))
+    exit(1)
