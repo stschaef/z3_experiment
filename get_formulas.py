@@ -4,13 +4,13 @@ protocol = "tla_tcommit"
 
 patterns = {
     "toy_consensus": "../DP_reachability_results/exploreR_outputs/ex/ex_toy_consensus/*minClauses.txt",
-    "ex_lockservice": "../DP_reachability_results/exploreR_outputs/ex/ex_lockservice/*minClauses.txt",
+    "ex_lockserv_automaton": "../DP_reachability_results/exploreR_outputs/ex/ex_lockservice/*minClauses.txt",
     "ex_simpledecentralized_lock": "../DP_reachability_results/exploreR_outputs/ex/ex_simpledecentralized_lock/*minClauses.txt",
     "client_server": "../DP_reachability_results/exploreR_outputs/i4/client-server/*minClauses.txt",
     "tla_tcommit": "../DP_reachability_results/exploreR_outputs/tla/tla_tcommit/*minClauses.txt",
 }
 
-for protocol in ["toy_consensus", "ex_lockservice", "ex_simpledecentralized_lock", "client_server", "tla_tcommit"]:
+for protocol in ["toy_consensus", "ex_lockserv_automaton", "ex_simpledecentralized_lock", "client_server", "tla_tcommit"]:
     for filename in glob.glob(patterns[protocol]):
         if protocol == "toy_consensus":
             sig = filename[-21:-15]

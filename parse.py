@@ -1,13 +1,16 @@
 from distutils.command.build import build
 from typing import List
+import glob
 import logiclib
 import re
 
-protocols = ["toy_consensus",
-             "ex_lockservice",
-             "ex_simpledecentralized_lock",
-             "client_server", 
-             "tla_tcommit"]
+protocols = [
+    # "toy_consensus",
+    "ex_lockserv_automaton",
+    "ex_simpledecentralized_lock",
+    "client_server", 
+    "tla_tcommit"
+]
 
 quantifier = {
     "\\exists": "(exists ",
@@ -16,7 +19,7 @@ quantifier = {
 
 sorts = {
     "toy_consensus": ["node", "value", "quorum"],
-    "ex_lockservice": ["Node"],
+    "ex_lockserv_automaton": ["Node"],
     "ex_simpledecentralized_lock": ["Node"],
     "client_server": ["Client", "Server"],
     "tla_tcommit": ["RM"]
@@ -46,10 +49,12 @@ def build_smt(parsed, prot, ind_lvl):
     if type(parsed) != list:
         return ind_lvl * 4 * " " + parsed
     if len(parsed) == 0:
-        return ind_lvl * 4 * " " + ""
-    if len(parsed) == 1:
-        return ind_lvl * 4 * " " + parsed[0]
+        return ""
 
+    # unpack singleton
+    if len(parsed) == 1:
+        return build_smt(parsed[0], prot, ind_lvl)
+        
     # function application
     if len(parsed) == 2 and parsed[0] != "~" and type(parsed[1]) == list:
         arg_string = " ".join(parsed[1])
@@ -65,13 +70,31 @@ def build_smt(parsed, prot, ind_lvl):
     
     # and, or, equals
     if type(parsed[1]) == str and parsed[1] in operators.keys():
-        return ind_lvl * 4 * " " + f"({operators[parsed[1]]}\n{build_smt(parsed[0], prot, ind_lvl + 1)}\n{build_smt(parsed[2], prot, ind_lvl + 1)}\n{build_smt(')', prot, ind_lvl)}"
- 
-for line in open("formulas/ex_lockserv_automaton/ex_lockserv_automaton_3.txt"):
-    # print("formulas/client_server/client_server_1-2.txt"[:-4])
-    line = line.replace("_", "").replace("()", "")
-    parsed = logiclib.pyparsing_parse(line)
-    print(line)
-    print(parsed)
-    print(build_smt(parsed, "ex_lockservice", 0))
-    exit(1)
+        return ind_lvl * 4 * " " + f"({operators[parsed[1]]}\n{build_smt(parsed[0], prot, ind_lvl + 1)}\n{build_smt(parsed[2:], prot, ind_lvl + 1)}\n{build_smt(')', prot, ind_lvl)}"
+
+def preprocess_string(s):
+    s = s.replace("start_nodeIS", "start_node")
+    s = s.replace("_", "").replace("()", "")
+    return s
+
+def restore_formatting(s):
+    s = s.replace("unlockmsg", "unlock_msg")
+    s = s.replace("grantmsg", "grant_msg")
+    s = s.replace("holdslock", "holds_lock")
+    s = s.replace("lockmsg", "lock_msg")
+    s = s.replace("haslock", "has_lock")
+    s = s.replace("startnode", "start_node")
+    return s
+
+for protocol in protocols:
+    for filename in glob.glob(f"formulas/{protocol}/*.txt"):
+        destination = filename[:-4] + ".smt"
+        with open(destination, "w") as out_file:
+            out_file.write("(and\n")
+            for line in open(filename):
+                line = preprocess_string(line)
+                parsed = logiclib.pyparsing_parse(line)
+                answer = restore_formatting(build_smt(parsed, protocol, 0))
+                out_file.write(answer + "\n")
+            out_file.write(")\n")
+            

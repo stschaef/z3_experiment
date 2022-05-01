@@ -1,0 +1,23 @@
+(and
+(exists  ((C1 Client))
+    (forall  ((S1 Server))
+        (or
+            (link C1 S1)
+            (semaphore S1)
+        )
+    )
+)
+(exists  ((C1 Client))
+    (forall  ((S1 Server))
+        (not (link C1 S1))
+    )
+)
+(forall  ((C1 Client))
+    (forall  ((S1 Server))
+        (or
+            (not (link C1 S1))
+            (not (semaphore S1))
+        )
+    )
+)
+)
